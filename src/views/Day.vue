@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import DateRange from '@/features/day/components/DateRange.vue'
 import { useDay } from '@/features/day/composables/useDay'
 
-const { day, date, error, onSave, onReset } = useDay()
+const { day, date, statusHeader, error, onSave, onReset } = useDay()
 
 const actions = [
   { label: 'Work', color: 'primary', variant: 'tonal', action: () => day.toggleWork() },
@@ -11,13 +13,13 @@ const actions = [
     label: 'Sick',
     color: 'warning',
     variant: 'tonal',
-    action: day.setSick,
+    action: () => day.setSick(),
   },
   {
     label: 'Vacation',
     color: 'info',
     variant: 'tonal',
-    action: day.setVacation,
+    action: () => day.setVacation(),
   },
   {
     label: 'Reset',
@@ -37,6 +39,14 @@ const actions = [
 <template>
   <v-container class="py-8">
     <v-card class="mx-auto pa-6" max-width="520" elevation="3">
+      <v-card-item v-if="statusHeader" class="px-0 pt-0 justify-center">
+        <template #prepend>
+          <v-icon :icon="statusHeader.icon" />
+        </template>
+
+        <v-card-title>{{ statusHeader.label }}</v-card-title>
+      </v-card-item>
+
       <div class="text-center">
         <div class="text-overline text-medium-emphasis">Today</div>
 
