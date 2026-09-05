@@ -1,4 +1,4 @@
-import { getCurrentTime } from "@/util/time"
+import { getCurrentTime } from '@/util/time'
 
 export enum DayStatus {
   Undefined = 'undefined',
@@ -14,6 +14,14 @@ export class TimeRange {
     public start: string = '',
     public end: string = '',
   ) {}
+
+  isValid(): boolean {
+    return this.start !== '' && this.end !== '' && this.start < this.end
+  }
+
+  contains(range: TimeRange): boolean {
+    return this.isValid() && range.isValid() && this.start <= range.start && this.end >= range.end
+  }
 }
 
 export class Day {
@@ -79,5 +87,14 @@ export class Day {
     this.lunchHours.start = ''
     this.lunchHours.end = ''
     this.status = DayStatus.Undefined
+  }
+
+  isValid(): boolean {
+    return (
+      this.status == DayStatus.Vacation ||
+      this.status == DayStatus.Sick ||
+      (this.workingHours.isValid() &&
+        (!this.lunchHours.isValid() || this.workingHours.contains(this.lunchHours)))
+    )
   }
 }

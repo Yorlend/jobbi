@@ -2,7 +2,7 @@
 import DateRange from '@/features/day/components/DateRange.vue'
 import { useDay } from '@/features/day/composables/useDay'
 
-const { day, date } = useDay()
+const { day, date, error, onSave, onReset } = useDay()
 
 const actions = [
   { label: 'Work', color: 'primary', variant: 'tonal', action: () => day.toggleWork() },
@@ -11,19 +11,25 @@ const actions = [
     label: 'Sick',
     color: 'warning',
     variant: 'tonal',
-    action: () => day.setSick(),
+    action: day.setSick,
   },
   {
     label: 'Vacation',
     color: 'info',
     variant: 'tonal',
-    action: () => day.setVacation(),
+    action: day.setVacation,
   },
   {
     label: 'Reset',
     color: 'error',
     variant: 'outlined',
-    action: () => day.reset(),
+    action: onReset,
+  },
+  {
+    label: 'Save',
+    color: 'primary',
+    variant: 'tonal',
+    action: onSave,
   },
 ] as const
 </script>
@@ -72,5 +78,14 @@ const actions = [
         </v-btn>
       </div>
     </v-card>
+    <v-snackbar v-model="error">
+      <span>Save error</span>
+
+      <template v-slot:actions>
+        <v-btn color="pink" @click="error = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-container>
 </template>

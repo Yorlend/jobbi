@@ -1,9 +1,20 @@
 import { Day } from "@/features/day/models/day.ts";
-import { computed, reactive } from "vue";
+import { ServiceLocator } from "@/providers/dependencies";
+import { computed, onMounted, reactive, ref } from "vue";
 
 
 export function useDay() {
   const day = reactive(new Day())
+  const error = ref(false)
+
+  const dayRepo = ServiceLocator.day.repository
+
+  onMounted(async () => {
+    const dbDay = await dayRepo.getByDate(day.date)
+
+    if (dbDay !== undefined)
+      Object.assign(day, dbDay)
+  })
 
   const date = computed(() => {
     return day.date.toLocaleDateString('en-US', {
@@ -14,8 +25,23 @@ export function useDay() {
     })
   })
 
+  async function onSave() {
+    if (day.isValid())
+      await dayRepo.save(day)
+    else
+      error.value = true
+  }
+
+  async function onReset() {
+    await dayRepo.delete(day.date)
+    day.reset()
+  }
+
   return {
     day,
     date,
+    error,
+    onSave,
+    onReset,
   }
 }
