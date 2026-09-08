@@ -32,9 +32,15 @@ export function dateFromKey(key: string): Date {
   return new Date(year, month - 1, day)
 }
 
+export enum DayEntityType {
+  Plain = 'plain',
+  Draft = 'draft',
+}
+
 export interface DayEntity {
   date: string
   workingHours: TimeRangeEntity
   lunchHours: TimeRangeEntity
   status: DayStatusEntity
+  type: DayEntityType
 }

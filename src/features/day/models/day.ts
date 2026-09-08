@@ -15,6 +15,10 @@ export class TimeRange {
     public end: string = '',
   ) {}
 
+  isEmpty(): boolean {
+    return this.start === '' && this.end === ''
+  }
+
   isValid(): boolean {
     return this.start !== '' && this.end !== '' && this.start < this.end
   }
@@ -95,6 +99,14 @@ export class Day {
       this.status == DayStatus.Sick ||
       (this.workingHours.isValid() &&
         (!this.lunchHours.isValid() || this.workingHours.contains(this.lunchHours)))
+    )
+  }
+
+  isEmpty(): boolean {
+    return (
+      this.status !== DayStatus.Undefined
+      && this.workingHours.isEmpty()
+      && this.lunchHours.isEmpty()
     )
   }
 }

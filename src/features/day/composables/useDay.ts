@@ -1,7 +1,6 @@
-import { Day, DayStatus } from "@/features/day/models/day.ts";
-import { ServiceLocator } from "@/providers/dependencies";
-import { computed, onMounted, reactive, ref } from "vue";
-
+import { Day, DayStatus } from '@/features/day/models/day.ts'
+import { ServiceLocator } from '@/providers/dependencies'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 
 export function useDay() {
   const day = reactive(new Day())
@@ -10,10 +9,9 @@ export function useDay() {
   const dayRepo = ServiceLocator.day.repository
 
   onMounted(async () => {
-    const dbDay = await dayRepo.getByDate(day.date)
+    const dbDay = await dayRepo.getDraft()
 
-    if (dbDay !== undefined)
-      Object.assign(day, dbDay)
+    if (dbDay !== undefined) Object.assign(day, dbDay)
   })
 
   const date = computed(() => {
@@ -40,15 +38,23 @@ export function useDay() {
     }
   })
 
+  watch(
+    day,
+    async (value) => {
+      if (value !== null && !value.isEmpty()) {
+        await dayRepo.saveDraft(value)
+      }
+    },
+    { deep: true },
+  )
+
   async function onSave() {
-    if (day.isValid())
-      await dayRepo.save(day)
-    else
-      error.value = true
+    if (day.isValid()) await dayRepo.save(day)
+    else error.value = true
   }
 
   async function onReset() {
-    await dayRepo.delete(day.date)
+    await dayRepo.deleteDraft()
     day.reset()
   }
 

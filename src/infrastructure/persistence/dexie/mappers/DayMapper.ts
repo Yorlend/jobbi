@@ -1,5 +1,5 @@
 import { Day, DayStatus, TimeRange } from "@/features/day/models/day";
-import { dateFromKey, DayStatusEntity, toDateKey, type DayEntity, type TimeRangeEntity } from "../entities/DayEntity";
+import { dateFromKey, DayEntityType, DayStatusEntity, toDateKey, type DayEntity, type TimeRangeEntity } from "../entities/DayEntity";
 
 const TimeRangeMapper = {
   toModel(range: TimeRangeEntity): TimeRange {
@@ -24,12 +24,13 @@ export const DayMapper = {
     )
   },
 
-  fromModel(day: Day): DayEntity {
+  fromModel(day: Day, type: DayEntityType = DayEntityType.Plain): DayEntity {
     return {
       date: toDateKey(day.date),
       workingHours: TimeRangeMapper.fromModel(day.workingHours),
       lunchHours: TimeRangeMapper.fromModel(day.lunchHours),
       status: day.status as unknown as DayStatusEntity,
+      type: type,
     }
   }
 }
