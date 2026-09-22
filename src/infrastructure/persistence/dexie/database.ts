@@ -4,8 +4,6 @@ import type { DraftEntity } from "./entities/DraftEntity";
 
 
 export class AppIndexedDB extends Dexie {
-  static readonly DRAFT_ID = 'current_edit';
-
   days!: Table<DayEntity, string>
   drafts!: Table<DraftEntity, string>
 

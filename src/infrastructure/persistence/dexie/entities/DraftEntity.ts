@@ -7,7 +7,9 @@ export enum DraftTypeEntity {
 }
 
 export interface DraftEntity {
-  uid: string,
-  timestamp: number,
+  uid: string
+  title: string
+  start_ts: number | undefined
+  end_ts: number | undefined
   type: DraftTypeEntity
 }

@@ -1,5 +1,5 @@
 import type { DayRepository } from "@/features/day/services/DayRepository";
-import type { DraftRepository } from "@/features/day/services/DraftRepository";
+import type { DraftRepository } from "@/features/draft/services/DraftRepository";
 import { DexieDayRepository } from "@/infrastructure/persistence/dexie/repository/DexieDayRepository";
 import { DexieDraftRepository } from "@/infrastructure/persistence/dexie/repository/DexieDraftRepository";
 

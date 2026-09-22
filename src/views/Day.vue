@@ -1,101 +1,61 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 
-import DateRange from '@/features/day/components/DateRange.vue'
-import { useDay } from '@/features/day/composables/useDay'
+import { useDrafts } from '@/features/draft/composables/useDrafts'
+import DraftTimeline from '@/features/draft/components/DraftTimeline.vue'
+import CreateDraftDialog from '@/features/draft/components/CreateDraftDialog.vue'
 
-const { day, date, statusHeader, error, onSave, onReset } = useDay()
+const { drafts, onSave, onDelete, onDrop, showSaveDialog } = useDrafts()
 
 const actions = [
-  { label: 'Work', color: 'primary', variant: 'tonal', action: () => day.toggleWork() },
-  { label: 'Lunch', color: 'secondary', variant: 'tonal', action: () => day.toggleLunch() },
   {
-    label: 'Sick',
-    color: 'warning',
-    variant: 'tonal',
-    action: () => day.setSick(),
-  },
-  {
-    label: 'Vacation',
-    color: 'info',
-    variant: 'tonal',
-    action: () => day.setVacation(),
-  },
-  {
-    label: 'Reset',
-    color: 'error',
-    variant: 'outlined',
-    action: onReset,
-  },
-  {
-    label: 'Save',
+    label: 'Add',
     color: 'primary',
     variant: 'tonal',
-    action: onSave,
+    action: () => {
+      showSaveDialog.value = true
+    },
   },
+  {
+    label: 'Save Day',
+    color: 'secondary',
+    variant: 'tonal',
+    action: () => {},
+  },
+  {
+    label: 'Clear Drafts',
+    color: 'red',
+    variant: 'tonal',
+    action: () => onDrop(),
+  }
 ] as const
 </script>
 
 <template>
   <v-container class="py-8">
-    <v-card class="mx-auto pa-6" max-width="520" elevation="3">
-      <v-card-item v-if="statusHeader" class="px-0 pt-0 justify-center">
-        <template #prepend>
-          <v-icon :icon="statusHeader.icon" />
-        </template>
-
-        <v-card-title>{{ statusHeader.label }}</v-card-title>
-      </v-card-item>
-
-      <div class="text-center">
-        <div class="text-overline text-medium-emphasis">Today</div>
-
-        <h1 class="text-h4 font-weight-bold">
-          {{ date }}
-        </h1>
-      </div>
-
-      <v-divider class="my-6" />
-
-      <DateRange
-        v-model:start-time="day.workingHours.start"
-        v-model:end-time="day.workingHours.end"
-        title="Working hours"
-        class="mx-auto"
+    <div class="d-flex flex-wrap ga-2 flex-column align-center pa-4">
+      <DraftTimeline
+        v-for="draft in drafts"
+        :key="draft.uid"
+        :draft="draft"
+        @save="onSave"
+        @delete="onDelete"
       />
+    </div>
 
-      <v-divider class="my-6" />
-
-      <DateRange
-        v-model:start-time="day.lunchHours.start"
-        v-model:end-time="day.lunchHours.end"
-        title="Lunch hours"
-        class="mx-auto"
-      />
-
-      <v-divider class="my-6" />
-
-      <div class="d-flex flex-wrap ga-2">
-        <v-btn
-          v-for="action in actions"
-          :key="action.label"
-          :color="action.color"
-          :variant="action.variant"
-          @click="action.action"
-          class="flex-grow-1"
-        >
-          {{ action.label }}
-        </v-btn>
-      </div>
-    </v-card>
-    <v-snackbar v-model="error">
-      <span>Save error</span>
-
-      <template v-slot:actions>
-        <v-btn color="pink" @click="error = false">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-      </template>
-    </v-snackbar>
+    <div class="d-flex flex-wrap ga-2">
+      <v-btn
+        v-for="action in actions"
+        :key="action.label"
+        :color="action.color"
+        :variant="action.variant"
+        @click="action.action"
+        class="flex-grow-1"
+      >
+        {{ action.label }}
+      </v-btn>
+    </div>
+    <v-dialog v-model="showSaveDialog" max-width="500">
+      <CreateDraftDialog @save="onSave" @cancel="showSaveDialog = false" />
+    </v-dialog>
   </v-container>
 </template>
