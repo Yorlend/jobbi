@@ -3,7 +3,16 @@ import { useDrafts } from '@/features/draft/composables/useDrafts'
 import DraftTimeline from '@/features/draft/components/DraftTimeline.vue'
 import CreateDraftDialog from '@/features/draft/components/CreateDraftDialog.vue'
 
-const { drafts, onSave, onDelete, onDrop, showSaveDialog, getDayDuration } = useDrafts()
+const {
+  drafts,
+  onSave,
+  onDelete,
+  onDrop,
+  showSaveDialog,
+  getDayDuration,
+  commitError,
+  onDayCommit,
+} = useDrafts()
 
 const actions = [
   {
@@ -18,7 +27,9 @@ const actions = [
     label: 'Save Day',
     color: 'secondary',
     variant: 'tonal',
-    action: () => {},
+    action: () => {
+      onDayCommit()
+    },
   },
   {
     label: 'Clear Drafts',
@@ -41,9 +52,7 @@ const actions = [
       />
     </div>
 
-    <div class="d-flex flex-row-reverse">
-      Working hours: {{ getDayDuration() }}
-    </div>
+    <div class="d-flex flex-row-reverse">Working hours: {{ getDayDuration() }}</div>
 
     <div class="d-flex flex-wrap ga-2">
       <v-btn
@@ -59,6 +68,16 @@ const actions = [
     </div>
     <v-dialog v-model="showSaveDialog" max-width="500">
       <CreateDraftDialog @save="onSave" @cancel="showSaveDialog = false" />
+    </v-dialog>
+    <v-dialog v-model="commitError.status" max-width="500">
+      <v-card>
+        <v-card-title class="pt-4">Error</v-card-title>
+        <v-card-text class="pa-4">{{ commitError.message }}</v-card-text>
+        <v-card-actions class="pa-4 pt-0 ga-2">
+          <v-spacer />
+          <v-btn color="red" variant="outlined" @click="commitError.status = false">Cancel</v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
   </v-container>
 </template>

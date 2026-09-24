@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { dateToString, getDuration } from '@/util/time'
-import type { Draft } from '../models/draft'
+import { DraftType, type Draft } from '../models/draft'
 import { useDraftTimer } from '../composables/useDraftTimer'
 import { ref } from 'vue'
 import EditDraftDialog from './EditDraftDialog.vue'
@@ -27,6 +27,7 @@ const handleToggle = () => {
 <template>
   <v-card class="pa-4" width="400">
     <v-card-title class="px-0">
+      <v-icon>{{ draft.type === DraftType.Lunch ? 'mdi-food' : 'mdi-account-hard-hat' }}</v-icon>
       {{ draft.title }}
     </v-card-title>
 
@@ -64,6 +65,10 @@ const handleToggle = () => {
     </template>
   </v-card>
   <v-dialog v-model="showEditDialog" max-width="500">
-    <EditDraftDialog :draft="draft" @save="(d) => $emit('save', d)" @cancel="showEditDialog = false" />
+    <EditDraftDialog
+      :draft="draft"
+      @save="(d) => $emit('save', d)"
+      @cancel="showEditDialog = false"
+    />
   </v-dialog>
 </template>

@@ -1,11 +1,15 @@
-import { onMounted, onUnmounted, ref } from 'vue'
-import { DraftType, type Draft } from '../../draft/models/draft'
+import { onMounted, onUnmounted, reactive, ref } from 'vue'
+import { DraftType, validateDrafts, type Draft } from '../../draft/models/draft'
 import { ServiceLocator } from '@/providers/dependencies'
 import { getDurationInMinutes, getDurationStrFromMinutes } from '@/util/time'
 
 export function useDrafts() {
   const drafts = ref<Draft[]>([])
   const showSaveDialog = ref(false)
+  const commitError = reactive({
+    status: false,
+    message: ''
+  })
 
   const minuteTick = ref(0)
   let timer: ReturnType<typeof setInterval> | undefined
@@ -74,6 +78,19 @@ export function useDrafts() {
     return getDurationStrFromMinutes(minutes)
   }
 
+  async function onDayCommit() {
+    const status = validateDrafts(drafts.value)
+
+    console.log(status)
+
+    if (status.valid) {
+      /* Commit through DayRepository */
+    } else {
+      commitError.status = !status.valid
+      commitError.message = status.message ?? 'Unknown Error'
+    }
+  }
+
   return {
     drafts,
     onSave,
@@ -81,5 +98,7 @@ export function useDrafts() {
     onDrop,
     showSaveDialog,
     getDayDuration,
+    commitError,
+    onDayCommit,
   }
 }
