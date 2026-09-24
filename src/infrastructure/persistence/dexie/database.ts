@@ -10,7 +10,7 @@ export class AppIndexedDB extends Dexie {
     super('app-db')
 
     this.version(1).stores({
-      days: 'date',
+      days: 'uid, start_ts',
       drafts: 'uid',
     })
   }

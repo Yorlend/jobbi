@@ -8,7 +8,7 @@ export function useDrafts() {
   const showSaveDialog = ref(false)
   const commitError = reactive({
     status: false,
-    message: ''
+    message: '',
   })
 
   const minuteTick = ref(0)
@@ -26,11 +26,28 @@ export function useDrafts() {
     }
   })
 
-  const repo = ServiceLocator.draft.repository
+  const drafts_repo = ServiceLocator.draft.repository
+  const days_repo = ServiceLocator.day.repository
 
   onMounted(async () => {
-    drafts.value = await repo.getAll()
+    drafts.value = await drafts_repo.getAll()
   })
+
+  async function getSavedEntries() {
+    const saved_entries = await days_repo.getByDate(new Date())
+    if (saved_entries && saved_entries.drafts.length > 0) {
+      const existingUids = new Set(drafts.value.map((draft) => draft.uid))
+
+      const unique_saved_drafts = saved_entries.drafts.filter(
+        (draft) => !existingUids.has(draft.uid),
+      )
+
+      if (unique_saved_drafts.length > 0) {
+        await drafts_repo.bulkSave(unique_saved_drafts)
+      }
+      drafts.value = drafts.value.concat(unique_saved_drafts)
+    }
+  }
 
   async function onSave(draft: Draft) {
     const idx = drafts.value.findIndex((item) => item.uid === draft.uid)
@@ -41,7 +58,7 @@ export function useDrafts() {
       drafts.value[idx] = draft
     }
 
-    await repo.save(draft)
+    await drafts_repo.save(draft)
   }
 
   async function onDelete(uid: string) {
@@ -52,7 +69,7 @@ export function useDrafts() {
     }
 
     try {
-      await repo.delete(uid)
+      await drafts_repo.delete(uid)
     } catch (error) {
       console.log('Failed to delete draft: ', error)
     }
@@ -60,7 +77,7 @@ export function useDrafts() {
 
   async function onDrop() {
     drafts.value.splice(0, drafts.value.length)
-    await repo.drop()
+    await drafts_repo.drop()
   }
 
   function getDayDuration(): string {
@@ -84,7 +101,10 @@ export function useDrafts() {
     console.log(status)
 
     if (status.valid) {
-      /* Commit through DayRepository */
+      await days_repo.save({
+        date: new Date(),
+        drafts: drafts.value,
+      })
     } else {
       commitError.status = !status.valid
       commitError.message = status.message ?? 'Unknown Error'
@@ -100,5 +120,6 @@ export function useDrafts() {
     getDayDuration,
     commitError,
     onDayCommit,
+    getSavedEntries,
   }
 }

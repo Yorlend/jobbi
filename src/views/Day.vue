@@ -12,6 +12,7 @@ const {
   getDayDuration,
   commitError,
   onDayCommit,
+  getSavedEntries,
 } = useDrafts()
 
 const actions = [
@@ -21,6 +22,14 @@ const actions = [
     variant: 'tonal',
     action: () => {
       showSaveDialog.value = true
+    },
+  },
+  {
+    label: 'Get Saved',
+    color: 'green',
+    variant: 'tonal',
+    action: () => {
+      getSavedEntries()
     },
   },
   {

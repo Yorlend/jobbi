@@ -8,6 +8,11 @@ export class DexieDraftRepository implements DraftRepository {
     await db.drafts.put(DraftMapper.fromModel(draft))
   }
 
+  async bulkSave(drafts: Draft[]): Promise<void> {
+    const entities = drafts.map((draft) => DraftMapper.fromModel(draft))
+    db.drafts.bulkPut(entities)
+  }
+
   async getAll(): Promise<Draft[]> {
     const records = await db.drafts //
       .orderBy('uid')
