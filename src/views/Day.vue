@@ -1,10 +1,9 @@
 <script setup lang="ts">
-
 import { useDrafts } from '@/features/draft/composables/useDrafts'
 import DraftTimeline from '@/features/draft/components/DraftTimeline.vue'
 import CreateDraftDialog from '@/features/draft/components/CreateDraftDialog.vue'
 
-const { drafts, onSave, onDelete, onDrop, showSaveDialog } = useDrafts()
+const { drafts, onSave, onDelete, onDrop, showSaveDialog, getDayDuration } = useDrafts()
 
 const actions = [
   {
@@ -26,7 +25,7 @@ const actions = [
     color: 'red',
     variant: 'tonal',
     action: () => onDrop(),
-  }
+  },
 ] as const
 </script>
 
@@ -40,6 +39,10 @@ const actions = [
         @save="onSave"
         @delete="onDelete"
       />
+    </div>
+
+    <div class="d-flex flex-row-reverse">
+      Working hours: {{ getDayDuration() }}
     </div>
 
     <div class="d-flex flex-wrap ga-2">

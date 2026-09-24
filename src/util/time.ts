@@ -23,21 +23,29 @@ export function getDateFromTime(time: string) {
   return date
 }
 
-export function getDuration(from: Date | undefined, to: Date | undefined): string {
-  if (!from) return '00:00'
+export function getDurationInMinutes(from: Date | undefined, to: Date | undefined): number {
+  if (!from) return 0
 
   if (!to) to = new Date()
 
-  const minutes = Math.floor((to.getTime() - from.getTime()) / (60 * 1000))
+  return Math.floor((to.getTime() - from.getTime()) / (60 * 1000))
+}
 
-  if (minutes < 0) {
-    return '00:00'
-  }
-
+export function getDurationStrFromMinutes(minutes: number): string {
   const h = Math.floor(minutes / 60)
   const m = minutes % 60
 
+  if (minutes <= 0) {
+    return '00:00'
+  }
+
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+}
+
+export function getDuration(from: Date | undefined, to: Date | undefined): string {
+  const minutes = getDurationInMinutes(from, to)
+
+  return getDurationStrFromMinutes(minutes)
 }
 
 export function dateToString(date: Date | undefined): string {

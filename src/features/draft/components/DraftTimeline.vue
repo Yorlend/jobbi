@@ -16,7 +16,7 @@ const emit = defineEmits<{
 
 const showEditDialog = ref(false)
 
-const { toggleTimer, canToggle } = useDraftTimer()
+const { toggleTimer, canToggle, getDraftDuration } = useDraftTimer()
 
 const handleToggle = () => {
   const upd = toggleTimer(props.draft)
@@ -37,7 +37,7 @@ const handleToggle = () => {
       </div>
       <div class="d-flex ga-4 mb-3">
         <v-spacer />
-        <span>Duration: {{ getDuration(draft.start_time, draft.end_time) }}</span>
+        <span>Duration: {{ getDraftDuration(draft) }}</span>
       </div>
     </v-card-text>
 

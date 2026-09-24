@@ -1,10 +1,9 @@
 import Dexie, { type Table } from "dexie";
-import type { DayEntity } from "./entities/DayEntity";
 import type { DraftEntity } from "./entities/DraftEntity";
 
 
 export class AppIndexedDB extends Dexie {
-  days!: Table<DayEntity, string>
+  days!: Table<DraftEntity, string>
   drafts!: Table<DraftEntity, string>
 
   constructor() {

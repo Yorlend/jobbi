@@ -1,11 +1,26 @@
-import { onMounted, ref } from "vue";
-import { type Draft } from "../../draft/models/draft";
-import { ServiceLocator } from "@/providers/dependencies";
-
+import { onMounted, onUnmounted, ref } from 'vue'
+import { DraftType, type Draft } from '../../draft/models/draft'
+import { ServiceLocator } from '@/providers/dependencies'
+import { getDurationInMinutes, getDurationStrFromMinutes } from '@/util/time'
 
 export function useDrafts() {
   const drafts = ref<Draft[]>([])
   const showSaveDialog = ref(false)
+
+  const minuteTick = ref(0)
+  let timer: ReturnType<typeof setInterval> | undefined
+
+  onMounted(() => {
+    timer = setInterval(() => {
+      minuteTick.value++
+    }, 60_000)
+  })
+
+  onUnmounted(() => {
+    if (timer) {
+      clearInterval(timer)
+    }
+  })
 
   const repo = ServiceLocator.draft.repository
 
@@ -14,7 +29,7 @@ export function useDrafts() {
   })
 
   async function onSave(draft: Draft) {
-    const idx = drafts.value.findIndex(item => item.uid === draft.uid)
+    const idx = drafts.value.findIndex((item) => item.uid === draft.uid)
 
     if (idx === -1) {
       drafts.value.push(draft)
@@ -26,7 +41,7 @@ export function useDrafts() {
   }
 
   async function onDelete(uid: string) {
-    const idx = drafts.value.findIndex(item => item.uid === uid)
+    const idx = drafts.value.findIndex((item) => item.uid === uid)
 
     if (idx !== -1) {
       drafts.value.splice(idx, 1)
@@ -35,7 +50,7 @@ export function useDrafts() {
     try {
       await repo.delete(uid)
     } catch (error) {
-      console.log("Failed to delete draft: ", error)
+      console.log('Failed to delete draft: ', error)
     }
   }
 
@@ -44,11 +59,27 @@ export function useDrafts() {
     await repo.drop()
   }
 
+  function getDayDuration(): string {
+    minuteTick.value
+
+    let minutes = 0
+    drafts.value.forEach((draft) => {
+      const draftDur = getDurationInMinutes(draft.start_time, draft.end_time)
+      if (draft.type == DraftType.Work) {
+        minutes += draftDur
+      } else {
+        minutes -= draftDur
+      }
+    })
+    return getDurationStrFromMinutes(minutes)
+  }
+
   return {
     drafts,
     onSave,
     onDelete,
     onDrop,
     showSaveDialog,
+    getDayDuration,
   }
 }

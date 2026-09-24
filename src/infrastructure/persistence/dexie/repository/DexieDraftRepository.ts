@@ -11,7 +11,6 @@ export class DexieDraftRepository implements DraftRepository {
   async getAll(): Promise<Draft[]> {
     const records = await db.drafts //
       .orderBy('uid')
-      .reverse()
       .toArray()
 
     return records.map(DraftMapper.toModel)
